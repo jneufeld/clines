@@ -1,5 +1,9 @@
 #include <stdio.h>
+
 #define BUFFER_SIZE 256
+#define KEY_SPACE	32
+#define KEY_TAB		9
+#define KEY_NEWLINE	'\n'
 
 /*
  * Function prototypes
@@ -7,6 +11,7 @@
 void count_lines (const char *fname);
 void print_lines (int total, int code, int comment, 
 					int whitespace, const char *name);
+int start_index (const int *line, int i);
 
 /*
  * main
@@ -15,7 +20,7 @@ int main (int argc, char **argv)
 {
 	if (argc == 1)
 	{
-		printf ("Usage: clines filename\n");
+		printf ("Usage: clines cfile1 [cfile2 ...]\n");
 		return -1;
 	}
 
@@ -47,20 +52,85 @@ void count_lines (const char *fname)
 	int code		= 0;
 	int comment		= 0;
 	int whitespace	= 0;
+	int in_comment	= 0;
 
 	int buffer[BUFFER_SIZE], c = 0;
 	while (c != EOF)
 	{
+		// Put next line in buffer
 		int i = 0;
 		do {
 			c = fgetc (f);
 			buffer[i++] = c;
 		} while (c != '\n' && c != EOF);
 		total++;
+
+		// Check if we're in a multi-line comment
+		int s = start_index (buffer, i);
+		if (in_comment)
+		{
+			// Check if multi-line comment ends
+			int j;
+			for (j = 0; j < i - 1; j++)
+			{
+				if (buffer[j] == '*' && buffer[j + 1] == '/')
+				{
+					in_comment = 0;
+					break;
+				}
+			}
+			comment++;
+		}
+
+		// Not in multi-line comment
+		else
+		{
+			// Only whitespace characters
+			if (i == s)
+			{
+				whitespace++;
+			}
+
+			// Single-line comment
+			else if (buffer[s] == '/' && buffer[s + 1] == '/')
+			{
+				comment++;
+			}
+
+			// Multi-line comment
+			else if (buffer[s] == '/' && buffer[s + 1] == '*')
+			{
+				comment++;
+				in_comment = 1;
+			}
+		
+			// Must be a line of code
+			else
+			{
+				code++;
+			}
+		}
 	}
 
+	// Print result and return
 	print_lines (total, code, comment, whitespace, fname);
 	fclose (f);
+}
+
+/*
+ * start_index
+ */
+int start_index (const int *line, int i)
+{
+	// Trim prepending whitespace
+	int j;
+	for (j = 0; j < i; j++)
+	{
+		if (line[j] != KEY_SPACE && line[j] != KEY_TAB
+			&& line[j] != KEY_NEWLINE)
+			break;
+	}
+	return j;
 }
 
 /*
