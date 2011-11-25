@@ -12,6 +12,7 @@ void count_lines (const char *fname);
 void print_lines (int total, int code, int comment, 
 					int whitespace, const char *name);
 int start_index (const int *line, int i);
+void ratio_bar (char *bar_array, int total, int num);
 
 /*
  * main
@@ -134,14 +135,36 @@ int start_index (const int *line, int i)
 }
 
 /*
+ * num_bars
+ */
+void ratio_bar (char *bar_array, int total, int num)
+{
+	int i;
+	for (i = 0; i < 10; i++)
+	{
+		bar_array[i] = ' ';
+	}
+
+	for (i = 0; i < (num * 10) / total; i++)
+	{
+		bar_array[i] = 'x';
+	} 
+}
+
+/*
  * print_lines
  */
 void print_lines (int total, int code, int comment, 
 					int whitespace, const char *name)
 {
+	char code_bars[10], comment_bars[10], blank_bars[10];
+	ratio_bar (code_bars, total, code);
+	ratio_bar (comment_bars, total, comment);
+	ratio_bar (blank_bars, total, whitespace);
+
 	printf ("%s\n", name);
-	printf ("Total:   %d\n", total);
-	printf ("Code:    %d\n", code);
-	printf ("Comment: %d\n", comment);
-	printf ("Blanks:  %d\n", whitespace);
+	printf ("%-10s %-8d %s\n", "Code", code, code_bars);
+	printf ("%-10s %-8d %s\n", "Comment", comment, comment_bars);
+	printf ("%-10s %-8d %s\n", "Blank", whitespace, blank_bars);
+	printf ("%-10s %-8d\n", "Total", total);
 }
