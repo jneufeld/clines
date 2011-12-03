@@ -1,16 +1,16 @@
 #include <stdio.h>
 
 #define BUFFER_SIZE 256
-#define KEY_SPACE	32
-#define KEY_TAB		9
-#define KEY_NEWLINE	'\n'
+#define KEY_SPACE   32
+#define KEY_TAB     9
+#define KEY_NEWLINE '\n'
 
 /*
  * Function prototypes
  */
 void count_lines (const char *fname);
 void print_lines (int total, int code, int comment, 
-					int whitespace, const char *name);
+                  int whitespace, const char *name);
 int start_index (const int *line, int i);
 void ratio_bar (char *bar_array, int total, int num);
 
@@ -19,22 +19,21 @@ void ratio_bar (char *bar_array, int total, int num);
  */
 int main (int argc, char **argv)
 {
-	if (argc == 1)
-	{
-		printf ("Usage: clines cfile1 [cfile2 ...]\n");
-		return -1;
-	}
+    // Robust error checking!
+    if (argc == 1) {
+        printf ("Usage: clines cfile1 [cfile2 ...]\n");
+        return -1;
+    }
 
-	int i;
-	for (i = 1; i < argc; i++)
-	{
-		if (i > 1)
-		{
-			printf ("\n");
-		}
-		count_lines (argv[i]);
-	}
-	return 0;
+    // Display line counts for each file
+    int i;
+    for (i = 1; i < argc; i++) {
+        if (i > 1) {
+            printf ("\n");
+        }
+        count_lines (argv[i]);
+    }
+    return 0;
 }
 
 /*
@@ -42,80 +41,70 @@ int main (int argc, char **argv)
  */
 void count_lines (const char *fname)
 {
-	FILE *f = fopen (fname, "r");
-	if (!f)
-	{
-		printf ("Couldn't open file: %s\n", fname);
-		return;
-	}
+    FILE *f = fopen (fname, "r");
+    if (!f) {
+        printf ("Couldn't open file: %s\n", fname);
+        return;
+    }
 
-	int total		= 0;
-	int code		= 0;
-	int comment		= 0;
-	int whitespace	= 0;
-	int in_comment	= 0;
+    int total      = 0;
+    int code       = 0;
+    int comment    = 0;
+    int whitespace = 0;
+    int in_comment = 0;
 
-	int buffer[BUFFER_SIZE], c = 0;
-	while (c != EOF)
-	{
-		// Put next line in buffer
-		int i = 0;
-		do {
-			c = fgetc (f);
-			buffer[i++] = c;
-		} while (c != '\n' && c != EOF);
-		total++;
+    int buffer[BUFFER_SIZE], c = 0;
+    while (c != EOF) {
+        // Put next line in buffer
+        int i = 0;
+        do {
+            c = fgetc (f);
+            buffer[i++] = c;
+        } while (c != '\n' && c != EOF);
+        total++;
 
-		// Check if we're in a multi-line comment
-		int s = start_index (buffer, i);
-		if (in_comment)
-		{
-			// Check if multi-line comment ends
-			int j;
-			for (j = 0; j < i - 1; j++)
-			{
-				if (buffer[j] == '*' && buffer[j + 1] == '/')
-				{
-					in_comment = 0;
-					break;
-				}
-			}
-			comment++;
-		}
+        // Check if we're in a multi-line comment
+        int s = start_index (buffer, i);
+        if (in_comment) {
+            // Check if multi-line comment ends
+            int j;
+            for (j = 0; j < i - 1; j++) {
+                if (buffer[j] == '*' && buffer[j + 1] == '/') {
+                    in_comment = 0;
+                    break;
+                }
+            }
+            comment++;
+        }
 
-		// Not in multi-line comment
-		else
-		{
-			// Only whitespace characters
-			if (i == s)
-			{
-				whitespace++;
-			}
+        // Not in multi-line comment
+        else {
+            // Only whitespace characters
+            if (i == s) {
+                whitespace++;
+            }
 
-			// Single-line comment
-			else if (buffer[s] == '/' && buffer[s + 1] == '/')
-			{
-				comment++;
-			}
+            // Single-line comment
+            else if (buffer[s] == '/' && buffer[s + 1] == '/') {
+                comment++;
+            }
 
-			// Multi-line comment
-			else if (buffer[s] == '/' && buffer[s + 1] == '*')
-			{
-				comment++;
-				in_comment = 1;
-			}
-		
-			// Must be a line of code
-			else
-			{
-				code++;
-			}
-		}
-	}
+            // Multi-line comment
+            else if (buffer[s] == '/' && buffer[s + 1] == '*') {
+                comment++;
+                in_comment = 1;
+            }
+        
+            // Must be a line of code
+            else {
+                code++;
+            }
+        }
+    }
 
-	// Print result and return
-	print_lines (total, code, comment, whitespace, fname);
-	fclose (f);
+    // Print result and return
+    print_lines (total, code, comment, whitespace, fname);
+    fclose (f);
 }
 
 /*
@@ -123,15 +112,14 @@ void count_lines (const char *fname)
  */
 int start_index (const int *line, int i)
 {
-	// Trim prepending whitespace
-	int j;
-	for (j = 0; j < i; j++)
-	{
-		if (line[j] != KEY_SPACE && line[j] != KEY_TAB
-			&& line[j] != KEY_NEWLINE)
-			break;
-	}
-	return j;
+    // Trim prepending whitespace
+    int j;
+    for (j = 0; j < i; j++) {
+        if (line[j] != KEY_SPACE && line[j] != KEY_TAB
+            && line[j] != KEY_NEWLINE)
+            break;
+    }
+    return j;
 }
 
 /*
@@ -139,32 +127,29 @@ int start_index (const int *line, int i)
  */
 void ratio_bar (char *bar_array, int total, int num)
 {
-	int i;
-	for (i = 0; i < 10; i++)
-	{
-		bar_array[i] = ' ';
-	}
+    int i;
+    for (i = 0; i < 10; i++) {
+        bar_array[i] = ' ';
+    }
 
-	for (i = 0; i < (num * 10) / total; i++)
-	{
-		bar_array[i] = 'x';
-	} 
+    for (i = 0; i < (num * 10) / total; i++) {
+        bar_array[i] = 'x';
+    } 
 }
 
 /*
  * print_lines
  */
 void print_lines (int total, int code, int comment, 
-					int whitespace, const char *name)
+                  int whitespace, const char *name)
 {
-	char code_bars[10], comment_bars[10], blank_bars[10];
-	ratio_bar (code_bars, total, code);
-	ratio_bar (comment_bars, total, comment);
-	ratio_bar (blank_bars, total, whitespace);
+    int code_ratio        = (float) code / total * 100;
+    int comment_ratio     = (float) comment / total * 100;
+    int whitespace_ratio  = (float) whitespace / total * 100;
 
-	printf ("%s\n", name);
-	printf ("%-10s %-8d %s\n", "Code", code, code_bars);
-	printf ("%-10s %-8d %s\n", "Comment", comment, comment_bars);
-	printf ("%-10s %-8d %s\n", "Blank", whitespace, blank_bars);
-	printf ("%-10s %-8d\n", "Total", total);
+    printf ("%s\n", name);
+    printf ("%-10s %8d %8d%%\n", "Code", code, code_ratio);
+    printf ("%-10s %8d %8d%%\n", "Comment", comment, comment_ratio);
+    printf ("%-10s %8d %8d%%\n", "Blank", whitespace, whitespace_ratio);
+    printf ("%-10s %8d %8s%%\n", "Total", total, "100");
 }

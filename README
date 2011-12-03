@@ -1,1 +1,29 @@
-Filesystem porn, counting files!
+This little program takes some C source files as input and produces simple line
+counts as its output. I'm always interested in how many lines of code I've
+written, and how it compares to my (often verbose) comments. clines tells you
+how many lines of your code are code lines, how many are strictly comment lines
+and how many whitespace lines are in a file.
+
+Here's a couple sample runs:
+
+./clines testfile
+testfile
+Code              4       19%
+Comment          14       66%
+Blank             3       14%
+Total            21      100%
+
+./clines testfile clines.c
+testfile
+Code              4       19%
+Comment          14       66%
+Blank             3       14%
+Total            21      100%
+
+clines.c
+Code            108       69%
+Comment          30       19%
+Blank            18       11%
+Total           156      100%
+
+Woo!
