@@ -122,21 +122,7 @@ int start_index (const int *line, int i)
     return j;
 }
 
-/*
- * num_bars
- */
-void ratio_bar (char *bar_array, int total, int num)
-{
-    int i;
-    for (i = 0; i < 10; i++) {
-        bar_array[i] = ' ';
-    }
-
-    for (i = 0; i < (num * 10) / total; i++) {
-        bar_array[i] = 'x';
-    } 
-}
-
+/
 /*
  * print_lines
  */
