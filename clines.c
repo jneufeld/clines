@@ -122,7 +122,6 @@ int start_index (const int *line, int i)
     return j;
 }
 
-/
 /*
  * print_lines
  */
