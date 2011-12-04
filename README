@@ -1,11 +1,10 @@
-This little program takes some C source files as input and produces simple line
-counts as its output. I'm always interested in how many lines of code I've
-written, and how it compares to my (often verbose) comments. clines tells you
-how many lines of your code are code lines, how many are strictly comment lines
-and how many whitespace lines are in a file.
+This little program takes some C/C++ source files* as input and produces simple
+line counts as its output. I'm always interested in how many lines of code I've
+written and how it compares to my (often verbose) comments. clines tells you how
+many lines of your code are code lines, strictly comment lines and whitespace
+lines.
 
-Here's a couple sample runs:
-
+Here's a sample run on a single file:
 ./clines testfile
 testfile
 Code              4       19%
@@ -13,6 +12,7 @@ Comment          14       66%
 Blank             3       14%
 Total            21      100%
 
+And a sample run on multiple files:
 ./clines testfile clines.c
 testfile
 Code              4       19%
@@ -21,9 +21,16 @@ Blank             3       14%
 Total            21      100%
 
 clines.c
-Code            108       69%
-Comment          30       19%
-Blank            18       11%
-Total           156      100%
+Code            112       68%
+Comment          32       19%
+Blank            19       11%
+Total           163      100%
 
-Woo!
+Totals
+Code            116       63%
+Comment          46       25%
+Blank            22       11%
+Total           184      100%
+
+* This essentially works for any language that uses C-like comments, i.e. single
+line comments with '// ...' and multiline comments with '/* ... */'.
