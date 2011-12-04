@@ -6,6 +6,14 @@
 #define KEY_NEWLINE '\n'
 
 /*
+ * Global counts
+ */
+int code_g        = 0;
+int comment_g     = 0;
+int whitespace_g  = 0;
+int total_g       = 0;
+
+/*
  * Function prototypes
  */
 void count_lines (const char *fname);
@@ -33,6 +41,13 @@ int main (int argc, char **argv)
         }
         count_lines (argv[i]);
     }
+
+    // If multiple files given, print totals for all files
+    if (argc > 2) {
+        printf ("\n");
+        print_lines (total_g, code_g, comment_g, whitespace_g, "Totals");  
+    }
+
     return 0;
 }
 
@@ -47,11 +62,12 @@ void count_lines (const char *fname)
         return;
     }
 
-    int total      = 0;
-    int code       = 0;
-    int comment    = 0;
-    int whitespace = 0;
-    int in_comment = 0;
+    // Local counts, just for this file
+    int total_l         = 0;
+    int code_l          = 0;
+    int comment_l       = 0;
+    int whitespace_l    = 0;
+    int in_comment      = 0;
 
     int buffer[BUFFER_SIZE], c = 0;
     while (c != EOF) {
@@ -61,7 +77,8 @@ void count_lines (const char *fname)
             c = fgetc (f);
             buffer[i++] = c;
         } while (c != '\n' && c != EOF);
-        total++;
+        total_l++;
+        total_g++;
 
         // Check if we're in a multi-line comment
         int s = start_index (buffer, i);
@@ -74,36 +91,41 @@ void count_lines (const char *fname)
                     break;
                 }
             }
-            comment++;
+            comment_l++;
+            comment_g++;
         }
 
         // Not in multi-line comment
         else {
             // Only whitespace characters
             if (i == s) {
-                whitespace++;
+                whitespace_l++;
+                whitespace_g++;
             }
 
             // Single-line comment
             else if (buffer[s] == '/' && buffer[s + 1] == '/') {
-                comment++;
+                comment_l++;
+                comment_g++;
             }
 
             // Multi-line comment
             else if (buffer[s] == '/' && buffer[s + 1] == '*') {
-                comment++;
+                comment_l++;
+                comment_g++;
                 in_comment = 1;
             }
         
             // Must be a line of code
             else {
-                code++;
+                code_l++;
+                code_g++;
             }
         }
     }
 
     // Print result and return
-    print_lines (total, code, comment, whitespace, fname);
+    print_lines (total_l, code_l, comment_l, whitespace_l, fname);
     fclose (f);
 }
 
