@@ -1,9 +1,10 @@
 #include <stdio.h>
+#include <string.h>
 
-#define BUFFER_SIZE 256
-#define KEY_SPACE   32
-#define KEY_TAB     9
-#define KEY_NEWLINE '\n'
+#define MAX_LINE_LEN 512
+#define KEY_SPACE    ' '
+#define KEY_TAB      '\t'
+#define KEY_NEWLINE  '\n'
 
 /*
  * Global counts
@@ -16,11 +17,10 @@ int total_g       = 0;
 /*
  * Function prototypes
  */
-void count_lines (const char *fname);
+void count_lines (char *fname);
 void print_lines (int total, int code, int comment, 
-                  int whitespace, const char *name);
-int start_index (const int *line, int i);
-void ratio_bar (char *bar_array, int total, int num);
+                  int whitespace, char *name);
+int start_index (char *line, int i);
 
 /*
  * main
@@ -54,7 +54,7 @@ int main (int argc, char **argv)
 /*
  * count_lines
  */
-void count_lines (const char *fname)
+void count_lines (char *fname)
 {
     FILE *f = fopen (fname, "r");
     if (!f) {
@@ -69,16 +69,11 @@ void count_lines (const char *fname)
     int whitespace_l    = 0;
     int in_comment      = 0;
 
-    int buffer[BUFFER_SIZE], c = 0;
-    while (c != EOF) {
-        // Put next line in buffer
-        int i = 0;
-        do {
-            c = fgetc (f);
-            buffer[i++] = c;
-        } while (c != '\n' && c != EOF);
+    char buffer[MAX_LINE_LEN];
+    while (fgets (buffer, MAX_LINE_LEN, f) != NULL) {
         total_l++;
         total_g++;
+        int i = strlen (buffer);
 
         // Check if we're in a multi-line comment
         int s = start_index (buffer, i);
@@ -132,7 +127,7 @@ void count_lines (const char *fname)
 /*
  * start_index
  */
-int start_index (const int *line, int i)
+int start_index (char *line, int i)
 {
     // Trim prepending whitespace
     int j;
@@ -148,7 +143,7 @@ int start_index (const int *line, int i)
  * print_lines
  */
 void print_lines (int total, int code, int comment, 
-                  int whitespace, const char *name)
+                  int whitespace, char *name)
 {
     int code_ratio        = (float) code / total * 100;
     int comment_ratio     = (float) comment / total * 100;
