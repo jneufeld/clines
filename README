@@ -7,30 +7,30 @@ lines.
 Here's a sample run on a single file:
 ./clines testfile
 testfile
-Code              4       19%
-Comment          14       66%
-Blank             3       14%
-Total            21      100%
+Code              3       13%
+Comment          15       68%
+Blank             4       18%
+Total            22      100%
 
 And a sample run on multiple files:
 ./clines testfile clines.c
 testfile
-Code              4       19%
-Comment          14       66%
-Blank             3       14%
-Total            21      100%
+Code              3       13%
+Comment          15       68%
+Blank             4       18%
+Total            22      100%
 
 clines.c
-Code            112       68%
-Comment          32       19%
-Blank            19       11%
-Total           163      100%
+Code            107       68%
+Comment          31       19%
+Blank            19       12%
+Total           157      100%
 
 Totals
-Code            116       63%
+Code            110       61%
 Comment          46       25%
-Blank            22       11%
-Total           184      100%
+Blank            23       12%
+Total           179      100%
 
 * This essentially works for any language that uses C-like comments, i.e. single
 line comments with '// ...' and multiline comments with '/* ... */'.
