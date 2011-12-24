@@ -21,6 +21,7 @@ void count_lines (char *fname);
 void print_lines (int total, int code, int comment, 
                   int whitespace, char *name);
 int start_index (char *line, int i);
+int comment_ends (char *buffer, int len);
 
 /*
  * main
@@ -78,16 +79,12 @@ void count_lines (char *fname)
         // Check if we're in a multi-line comment
         int s = start_index (buffer, i);
         if (in_comment) {
-            // Check if multi-line comment ends
-            int j;
-            for (j = 0; j < i - 1; j++) {
-                if (buffer[j] == '*' && buffer[j + 1] == '/') {
-                    in_comment = 0;
-                    break;
-                }
+            if (comment_ends (buffer, i)) {
+                in_comment = 0;
             }
             comment_l++;
             comment_g++;
+            printf ("Comment line A:\n%s\n\n", buffer);
         }
 
         // Not in multi-line comment
@@ -102,13 +99,17 @@ void count_lines (char *fname)
             else if (buffer[s] == '/' && buffer[s + 1] == '/') {
                 comment_l++;
                 comment_g++;
+                printf ("Comment line B:\n%s\n\n", buffer);
             }
 
             // Multi-line comment
             else if (buffer[s] == '/' && buffer[s + 1] == '*') {
                 comment_l++;
                 comment_g++;
-                in_comment = 1;
+                printf ("Comment line C:\n%s\n\n", buffer);
+                if (!comment_ends (buffer, i)) {
+                    in_comment = 1;
+                }
             }
         
             // Must be a line of code
@@ -137,6 +138,20 @@ int start_index (char *line, int i)
             break;
     }
     return j;
+}
+
+/*
+ * comment_ends 
+ */
+int comment_ends (char *buffer, int len)
+{
+    int j;
+    for (j = 0; j < len; j++) {
+        if (buffer[j] == '*' && buffer[j + 1] == '/') {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 /*
