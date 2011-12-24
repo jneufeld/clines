@@ -84,7 +84,6 @@ void count_lines (char *fname)
             }
             comment_l++;
             comment_g++;
-            printf ("Comment line A:\n%s\n\n", buffer);
         }
 
         // Not in multi-line comment
@@ -99,14 +98,12 @@ void count_lines (char *fname)
             else if (buffer[s] == '/' && buffer[s + 1] == '/') {
                 comment_l++;
                 comment_g++;
-                printf ("Comment line B:\n%s\n\n", buffer);
             }
 
             // Multi-line comment
             else if (buffer[s] == '/' && buffer[s + 1] == '*') {
                 comment_l++;
                 comment_g++;
-                printf ("Comment line C:\n%s\n\n", buffer);
                 if (!comment_ends (buffer, i)) {
                     in_comment = 1;
                 }
