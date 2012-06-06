@@ -52,8 +52,8 @@ int main(int argc, char **argv)
  */
 struct file_counts *count_lines(char *fname)
 {
-    FILE *f = fopen(fname, "r");
-    if(!f) {
+    FILE *file_ptr = fopen(fname, "r");
+    if(!file_ptr) {
         printf("Couldn't open file: %s\n", fname);
         return NULL;
     }
@@ -64,15 +64,15 @@ struct file_counts *count_lines(char *fname)
     char buffer[MAX_LINE_LEN];
     int in_comment = 0;
 
-    while(fgets(buffer, MAX_LINE_LEN, f) != NULL) {
+    while(fgets(buffer, MAX_LINE_LEN, file_ptr) != NULL) {
         counts->total++;
 
-        int i = strlen(buffer);
+        int length = strlen(buffer);
 
         // Check if we're in a multi-line comment
-        int s = start_index(buffer, i);
+        int start  = start_index(buffer, length);
         if(in_comment) {
-            if(comment_ends (buffer, i)) {
+            if(comment_ends (buffer, length)) {
                 in_comment = 0;
             }
 
@@ -82,20 +82,20 @@ struct file_counts *count_lines(char *fname)
         // Not in multi-line comment
         else {
             // Only whitespace characters
-            if(i == s) {
+            if(length == start) {
                 counts->whitespace++;
             }
 
             // Single-line comment
-            else if(buffer[s] == '/' && buffer[s + 1] == '/') {
+            else if(buffer[start] == '/' && buffer[start + 1] == '/') {
                 counts->comment++;
             }
 
             // Multi-line comment
-            else if(buffer[s] == '/' && buffer[s + 1] == '*') {
+            else if(buffer[start] == '/' && buffer[start + 1] == '*') {
                 counts->comment++;
 
-                if(!comment_ends (buffer, i)) {
+                if(!comment_ends (buffer, length)) {
                     in_comment = 1;
                 }
             }
@@ -107,14 +107,14 @@ struct file_counts *count_lines(char *fname)
         }
     }
 
-    fclose(f);
+    fclose(file_ptr);
 
     // Return line counting results
     return counts;
 }
 
 /*
- * start_index
+ * start_index: Return index of first non-whitespace character.
  */
 int start_index(char *line, int i)
 {
@@ -130,7 +130,7 @@ int start_index(char *line, int i)
 }
 
 /*
- * comment_ends 
+ * comment_ends: Return 1 if a multiline comment is terminated in buffer. 
  */
 int comment_ends(char *buffer, int len)
 {
@@ -144,7 +144,7 @@ int comment_ends(char *buffer, int len)
 }
 
 /*
- * print_lines
+ * print_lines: Print formatted stats for a file.
  */
 void print_lines(struct file_counts *counts)
 {
@@ -164,7 +164,7 @@ void print_lines(struct file_counts *counts)
 }
 
 /*
- * calc_globals
+ * calc_globals: Calculate global stats over all files.
  */
 void calc_globals(struct file_counts *global,
     struct file_counts *counts[],
@@ -184,7 +184,7 @@ void calc_globals(struct file_counts *global,
 }
 
 /*
- * init_file_count
+ * init_file_count: Create new file_counts struct.
  */
 struct file_counts *init_file_count(char *name)
 {
@@ -204,7 +204,7 @@ struct file_counts *init_file_count(char *name)
 }
 
 /*
- * free_file_count
+ * free_file_count: Deallocate memory for file_counts struct.
  */
 void free_file_count(struct file_counts *counts)
 {
