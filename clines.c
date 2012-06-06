@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define MAX_LINE_LEN 512
@@ -30,7 +31,7 @@ int main(int argc, char **argv)
     // Robust error checking!
     if(argc == 1) {
         printf("Usage: clines cfile1 [cfile2 ...]\n");
-        return -1;
+        exit(-1);
     }
 
     // Display line counts for each file
