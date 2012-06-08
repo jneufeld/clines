@@ -14,9 +14,10 @@ int main(int argc, char **argv)
         exit(-1);
     }
 
-    // Create file_counts for individual files and global count
-    struct file_counts *counts[argc - 1];
-    struct file_counts *global_count = init_file_count("Totals");;
+    // Create file_counts structs for individual files and global count
+    struct file_counts current_count;
+    struct file_counts global_count; 
+    init_file_count(&global_count, "Totals");
 
     // Display line counts for each file
     int i;
@@ -25,42 +26,33 @@ int main(int argc, char **argv)
             printf("\n");
         }
 
-        counts[i - 1] = count_lines(argv[i]);
-        print_lines(counts[i - 1]);
+        init_file_count(&current_count, argv[i]);
+        count_lines(&current_count);
+        print_lines(&current_count);
+        calc_globals(&global_count, &current_count);
     }
 
     // If multiple files given, print totals for all files
     if(argc > 2) {
         printf("\n");
-        calc_globals(global_count, &counts, argc - 1);
-        print_lines(global_count);
-    }
-
-    // Free allocated memory
-    free_file_count(global_count);
-
-    int j;
-    for(j = 0; j < argc - 1; j++) {
-        free_file_count(counts[j]);
+        print_lines(&global_count);
     }
 
     return 0;
 }
 
 /*
- * count_lines: Return file_counts struct containing given file's stats.
+ * count_lines: Open file and parse stats into counts struct.
  */
-struct file_counts *count_lines(char *fname)
+void count_lines(struct file_counts *counts)
 {
-    FILE *file_ptr = fopen(fname, "r");
+    FILE *file_ptr = fopen(counts->file_name, "r");
     if(!file_ptr) {
-        printf("Couldn't open file: %s\n", fname);
-        return NULL;
+        printf("Couldn't open file: %s\n", counts->file_name);
+        return;
     }
 
     // Local counts, just for this file
-    struct file_counts *counts = init_file_count(fname);
-
     char buffer[MAX_LINE_LEN];
     int in_comment = 0;
 
@@ -108,9 +100,6 @@ struct file_counts *count_lines(char *fname)
     }
 
     fclose(file_ptr);
-
-    // Return line counting results
-    return counts;
 }
 
 /*
@@ -164,49 +153,28 @@ void print_lines(struct file_counts *counts)
 }
 
 /*
- * calc_globals: Calculate global stats over all files.
+ * calc_globals: Increase global counts by current file's counts.
  */
-void calc_globals(struct file_counts *global,
-    struct file_counts *counts[],
-    int count)
+void calc_globals(struct file_counts *global, struct file_counts *current)
 {
-    int i;
-    for(i = 0; i < count; i++) {
-        if(!counts[i]) {
-            continue;
-        }
-
-        global->code += counts[i]->code;
-        global->comment += counts[i]->comment;
-        global->whitespace += counts[i]->whitespace;
-        global->total += counts[i]->total;
-    }
+    global->code        += current->code;
+    global->comment     += current->comment;
+    global->whitespace  += current->whitespace;
+    global->total       += current->total;
 }
 
 /*
- * init_file_count: Create new file_counts struct.
+ * init_file_count: Initialize file_counts struct with given name.
  */
-struct file_counts *init_file_count(char *name)
+void init_file_count(struct file_counts *counts, char *name)
 {
-    struct file_counts *counts = malloc(sizeof(struct file_counts));
-
     // Set the file's name
     counts->file_name = malloc(sizeof(char) * strlen(name));
     strncpy(counts->file_name, name, strlen(name));
 
     // Set all fields to 0
-    counts->code = 0;
-    counts->comment = 0;
+    counts->code       = 0;
+    counts->comment    = 0;
     counts->whitespace = 0;
-    counts->total = 0;
-
-    return counts;
-}
-
-/*
- * free_file_count: Deallocate memory for file_counts struct.
- */
-void free_file_count(struct file_counts *counts)
-{
-    free(counts);
+    counts->total       = 0;
 }
